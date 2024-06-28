@@ -1,0 +1,17 @@
+{
+  "name": "mern-auth",
+  "version": "1.0.0",
+  "description": "Learning mern,redux,jwt,cookies,authentication and autherization",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon api/index.js",
+    "start": "node api/index.js"
+  },
+  "author": "Ramaditya panda",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4"
+  }
+}
