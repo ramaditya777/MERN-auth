@@ -12,6 +12,6 @@ mongoose
   .catch((e) => {
     console.log(e);
   });
-app.listen(3000, () => {
-  console.log(`Server listining on port 3000`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server listining on port ${process.env.PORT}`);
 });
