@@ -2,6 +2,7 @@ import User from "../models/user-model.js";
 //import bcrypt from "bcryptjs";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
+import jwt from "jsonwebtoken";
 
 export const signup = async (req, res, next) => {
   try {
@@ -17,10 +18,8 @@ export const signup = async (req, res, next) => {
 
     // Create a new user instance
     const newUser = new User({ username, email, password: hashedPassword });
-
     // Save the user to the database
     await newUser.save();
-
     // Send a success response
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
@@ -29,5 +28,38 @@ export const signup = async (req, res, next) => {
     // res.status(500).json(error.message);
     next(error);
     // next(errorHandler(300, "Something went wrong"));
+  }
+};
+
+export const signin = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const validUser = await User.findOne({ email });
+    if (!validUser) {
+      return next(errorHandler(404, "User not found"));
+    }
+    const validPassword = await bcryptjs.compare(password, validUser.password);
+    if (!validPassword) {
+      return next(errorHandler(401, "Wrong Credentials."));
+    }
+    //When both the email and password are correct, then we just add a token, i.e., cookies
+    //First we need to create a  JSON Web Token.
+    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+    //Remove the password, before sent to the user
+    const { password: hashedPassword, ...rest } = validUser._doc;
+    // Using _doc allows you to work directly with the document's data. In your case, the code snippet is using destructuring to extract the password property (renamed to hashedPassword) and the rest of the document's properties.
+
+    const expiryDate = new Date(Date.now() + 3600000); //1hour
+    res
+      .cookie("access_token", token, {
+        httpOnly: true,
+        secure: true,
+        expires: expiryDate,
+      }) //here you can also provide the time show that the cookies(jwt token present for give time)
+      .status(200)
+      .json(rest);
+    //  res.json({ message: 'Logged in successfully' });
+  } catch (error) {
+    next(error);
   }
 };
