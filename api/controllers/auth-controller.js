@@ -64,10 +64,6 @@ export const signin = async (req, res, next) => {
   }
 };
 
-import jwt from "jsonwebtoken";
-import bcryptjs from "bcryptjs";
-import User from "../models/User";
-
 export const google = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
